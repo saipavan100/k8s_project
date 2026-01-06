@@ -464,22 +464,23 @@ offices: [
       "Collaboration spaces"
     ]
   }
-]
-,contactInfo: {
-  recruitment: {
-    email: "careers@winwire.com",
-    message:
-      "For job opportunities, applications, and recruitment-related queries. Please apply through official hiring channels or share your resume when requested."
-  },
-  hr: {
-    email: "hr@winwire.com",
-    message:
-      "For employee-related queries such as onboarding, HR policies, benefits, leave, and internal processes."
-  },
-  general: {
-    email: "info@winwire.com",
-    message:
-      "For general business inquiries, partnerships, and company-related information."
+],
+  contactInfo: {
+    recruitment: {
+      email: "careers@winwire.com",
+      message:
+        "For job opportunities, applications, and recruitment-related queries. Please apply through official hiring channels or share your resume when requested."
+    },
+    hr: {
+      email: "hr@winwire.com",
+      message:
+        "For employee-related queries such as onboarding, HR policies, benefits, leave, and internal processes."
+    },
+    general: {
+      email: "info@winwire.com",
+      message:
+        "For general business inquiries, partnerships, and company-related information."
+    }
   }
 };
 
