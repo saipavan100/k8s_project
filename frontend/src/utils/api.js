@@ -1,33 +1,7 @@
 import axios from 'axios';
 
-// Smart API URL detection
-const getAPIURL = () => {
-  // 1. Explicit environment variable override (highest priority)
-  if (process.env.REACT_APP_API_URL) {
-    console.log('🔧 Using REACT_APP_API_URL from env');
-    return process.env.REACT_APP_API_URL;
-  }
-  
-  // 2. Detect based on hostname (smart detection)
-  const hostname = window.location.hostname;
-  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
-  
-  // 3. Local development detection
-  if (isLocalhost) {
-    const port = window.location.port;
-    // If on port 3000 (React dev server), backend is on port 5000
-    if (port === '3000' || port === '') {
-      console.log('🚀 Local dev detected - connecting to localhost:5000');
-      return 'http://localhost:5000/api';
-    }
-  }
-  
-  // 4. Production/Single service (both on same domain/port)
-  console.log('🌐 Production mode - using relative API path');
-  return '/api';
-};
-
-const API_URL = getAPIURL();
+// Use environment variable set at build time
+const API_URL = process.env.REACT_APP_API_URL || '/api';
 
 console.log('🎯 API Base URL:', API_URL);
 console.log('🌍 Environment:', process.env.NODE_ENV, `| Hostname: ${window.location.hostname}`);
