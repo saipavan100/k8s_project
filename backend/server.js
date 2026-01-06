@@ -24,20 +24,32 @@ const seedAdmin = require('./utils/seedAdmin');
 
 const app = express();
 
+// K8s/Docker mode - Accept requests from anywhere
 // Local development mode - CORS for separate frontend/backend services
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-  'http://localhost:5173',  
-  'http://127.0.0.1:5173'
-];
+const isDev = process.env.NODE_ENV === 'development';
 
-console.log('✅ CORS enabled for local development:', allowedOrigins);
+const corsConfig = isDev 
+  ? {
+      // Local development - restrict to localhost
+      origin: [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+        'http://localhost:5173',  
+        'http://127.0.0.1:5173'
+      ],
+      credentials: true
+    }
+  : {
+      // K8s/Production - accept from anywhere
+      origin: '*',
+      credentials: false,
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization']
+    };
 
-app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
-}));
+console.log(`✅ CORS enabled for ${isDev ? 'local development' : 'K8s/Production'}`);
+
+app.use(cors(corsConfig));
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -94,9 +106,13 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-const HOST = process.env.HOST || '0.0.0.0';
+// K8s requires 0.0.0.0, local dev can use localhost
+const HOST = process.env.HOST || (isDev ? 'localhost' : '0.0.0.0');
 
 app.listen(PORT, HOST, () => {
   console.log(`🚀 Backend Server running on http://${HOST}:${PORT}`);
-  console.log('⚡ Local Development Mode - Frontend runs separately on port 3000');
+  console.log(`📍 Mode: ${isDev ? '⚡ Local Development' : '☸️  Kubernetes/Production'}`);
+  if (!isDev) {
+    console.log('✅ Accepting requests from anywhere (K8s mode)');
+  }
 });
