@@ -1,5 +1,9 @@
 replicaCount: 1
 
+# Image Pull Secrets for private registries
+imagePullSecrets:
+  - name: acr-secret
+
 # Docker images from Azure Container Registry
 backend:
   repository: winonboard.azurecr.io/myapp-backend
