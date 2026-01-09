@@ -26,7 +26,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.ACR_NAME }}.azurecr.io
-          username: ${{ secrets.ACR_NAME }}
+          username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Build and push backend image
@@ -48,7 +48,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ secrets.ACR_NAME }}.azurecr.io
-          username: ${{ secrets.ACR_NAME }}
+          username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
 
       - name: Build and push frontend image
@@ -90,7 +90,7 @@ jobs:
         run: |
           kubectl create secret docker-registry acr-secret \
             --docker-server=${{ env.ACR_REGISTRY }} \
-            --docker-username=${{ secrets.ACR_NAME }} \
+            --docker-username=${{ secrets.ACR_USERNAME }} \
             --docker-password=${{ secrets.ACR_PASSWORD }} \
             -n ${{ env.NAMESPACE }} \
             --dry-run=client -o yaml | kubectl apply -f -
@@ -98,6 +98,9 @@ jobs:
       - name: Generate values-prod.yaml from GitHub secrets
         run: |
           cat > /tmp/values-prod.yaml <<'EOF'
+          imagePullSecrets:
+            - name: acr-secret
+          
           backend_secrets:
             MONGODB_URI: "${{ secrets.MONGODB_URI }}"
             JWT_SECRET: "${{ secrets.JWT_SECRET }}"
