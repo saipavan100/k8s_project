@@ -36,5 +36,8 @@ EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD wget --quiet --tries=1 --spider http://localhost/health || exit 1
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Install envsubst (gettext) to substitute environment variables
+RUN apk add --no-cache gettext
+
+# Start nginx with environment variable substitution
+CMD ["sh", "-c", "envsubst < /etc/nginx/nginx.conf > /etc/nginx/nginx.conf && nginx -g 'daemon off;'"]
