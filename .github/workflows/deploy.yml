@@ -88,6 +88,10 @@ jobs:
 
       - name: Create Kubernetes secrets from GitHub secrets
         run: |
+          # Delete old secret if it exists (to avoid Helm ownership conflict)
+          kubectl delete secret ${{ env.RELEASE_NAME }}-secret -n ${{ env.NAMESPACE }} --ignore-not-found=true
+          
+          # Create new secret
           kubectl create secret generic ${{ env.RELEASE_NAME }}-secret \
             --from-literal=MONGODB_URI="${{ secrets.MONGODB_URI }}" \
             --from-literal=JWT_SECRET="${{ secrets.JWT_SECRET }}" \
