@@ -1,20 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "win_k8s.fullname" . }}
+  name: {{ .Release.Name }}-win-k8s
   labels:
-    {{- include "win_k8s.labels" . | nindent 4 }}
+    app: {{ .Release.Name }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "win_k8s.selectorLabels" . | nindent 6 }}
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        {{- include "win_k8s.labels" . | nindent 8 }}
-        component: backend
-        component: frontend
+        app: {{ .Release.Name }}
     spec:
       containers:
         # Backend Container
@@ -23,17 +21,15 @@ spec:
           imagePullPolicy: {{ .Values.backend.pullPolicy }}
           ports:
             - name: backend
-              containerPort: {{ .Values.service.backendPort }}
+              containerPort: {{ .Values.service.backend.port }}
               protocol: TCP
           
-          # Load environment variables from ConfigMap
           envFrom:
             - configMapRef:
-                name: {{ include "win_k8s.fullname" . }}-config
+                name: {{ .Release.Name }}-config
             - secretRef:
-                name: {{ include "win_k8s.fullname" . }}-secret
+                name: {{ .Release.Name }}-secret
           
-          # Health check
           livenessProbe:
             httpGet:
               path: /health
@@ -54,15 +50,13 @@ spec:
           imagePullPolicy: {{ .Values.frontend.pullPolicy }}
           ports:
             - name: frontend
-              containerPort: {{ .Values.service.frontendPort }}
+              containerPort: {{ .Values.service.frontend.port }}
               protocol: TCP
           
-          # Load environment variables from ConfigMap
           envFrom:
             - configMapRef:
-                name: {{ include "win_k8s.fullname" . }}-config
+                name: {{ .Release.Name }}-config
           
-          # Health check
           livenessProbe:
             httpGet:
               path: /

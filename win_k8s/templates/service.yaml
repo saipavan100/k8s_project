@@ -3,9 +3,9 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "win_k8s.fullname" . }}-backend
+  name: {{ .Release.Name }}-backend
   labels:
-    {{- include "win_k8s.labels" . | nindent 4 }}
+    app: {{ .Release.Name }}
 spec:
   type: {{ .Values.service.backend.type }}
   ports:
@@ -14,17 +14,16 @@ spec:
       targetPort: backend
       protocol: TCP
   selector:
-    {{- include "win_k8s.selectorLabels" . | nindent 4 }}
-    component: backend
+    app: {{ .Release.Name }}
 
 ---
 # Frontend Service (ClusterIP or LoadBalancer)
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "win_k8s.fullname" . }}-frontend
+  name: {{ .Release.Name }}-frontend
   labels:
-    {{- include "win_k8s.labels" . | nindent 4 }}
+    app: {{ .Release.Name }}
 spec:
   type: {{ .Values.service.frontend.type }}
   ports:
@@ -33,5 +32,4 @@ spec:
       targetPort: frontend
       protocol: TCP
   selector:
-    {{- include "win_k8s.selectorLabels" . | nindent 4 }}
-    component: frontend
+    app: {{ .Release.Name }}
