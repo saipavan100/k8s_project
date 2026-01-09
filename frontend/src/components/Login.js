@@ -82,7 +82,7 @@ const Login = () => {
             <div className="winwire-logo">
               <span className="logo-win">Win</span><span className="logo-wire">Wire</span>
             </div>
-            <h2 className="login-title">Welcome Back</h2>
+            <h2 className="login-title">Welcome</h2>
             <p className="login-subtitle">Sign in to continue to your account</p>
           </div>
 
