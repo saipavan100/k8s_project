@@ -66,3 +66,10 @@ ingress:
 
 nameOverride: ""
 fullnameOverride: ""
+
+# Service Account Configuration
+serviceAccount:
+  create: false
+  automount: false
+  annotations: {}
+  name: ""
