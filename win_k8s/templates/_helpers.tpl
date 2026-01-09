@@ -2,19 +2,17 @@
 Expand the name of the chart.
 */}}
 {{- define "win_k8s.name" -}}
-{{- default .Chart.Name (include "getValueOrDefault" (dict "value" .Values.nameOverride)) | trunc 63 | trimSuffix "-" }}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
-We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
-If release name contains chart name it will be used as a full name.
 */}}
 {{- define "win_k8s.fullname" -}}
-{{- if and .Values .Values.fullnameOverride }}
+{{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
-{{- $name := default .Chart.Name (include "getValueOrDefault" (dict "value" .Values.nameOverride)) }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
 {{- if contains $name .Release.Name }}
 {{- .Release.Name | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -54,16 +52,5 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "win_k8s.serviceAccountName" -}}
-{{- if and .Values .Values.serviceAccount .Values.serviceAccount.create }}
-{{- default (include "win_k8s.fullname" .) (include "getValueOrDefault" (dict "value" .Values.serviceAccount.name)) }}
-{{- else }}
-{{- default "default" (include "getValueOrDefault" (dict "value" .Values.serviceAccount.name)) }}
-{{- end }}
-{{- end }}
-
-{{/*
-Helper to safely get values or return empty string
-*/}}
-{{- define "getValueOrDefault" -}}
-{{- if .value }}{{- .value }}{{- else }}{{- "" }}{{- end }}
+{{- default "default" .Values.serviceAccount.name }}
 {{- end }}
