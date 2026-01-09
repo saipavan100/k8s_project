@@ -86,6 +86,24 @@ jobs:
         run: |
           kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o yaml | kubectl apply -f -
 
+      - name: Create Kubernetes secrets from GitHub secrets
+        run: |
+          kubectl create secret generic ${{ env.RELEASE_NAME }}-secret \
+            --from-literal=MONGODB_URI="${{ secrets.MONGODB_URI }}" \
+            --from-literal=JWT_SECRET="${{ secrets.JWT_SECRET }}" \
+            --from-literal=JWT_EXPIRE="${{ secrets.JWT_EXPIRE }}" \
+            --from-literal=EMAIL_HOST="${{ secrets.EMAIL_HOST }}" \
+            --from-literal=EMAIL_PORT="${{ secrets.EMAIL_PORT }}" \
+            --from-literal=EMAIL_USER="${{ secrets.EMAIL_USER }}" \
+            --from-literal=EMAIL_PASSWORD="${{ secrets.EMAIL_PASSWORD }}" \
+            --from-literal=EMAIL_FROM="${{ secrets.EMAIL_FROM }}" \
+            --from-literal=ADMIN_EMAIL="${{ secrets.ADMIN_EMAIL }}" \
+            --from-literal=ADMIN_PASSWORD="${{ secrets.ADMIN_PASSWORD }}" \
+            --from-literal=AZURE_OPENAI_ENDPOINT="${{ secrets.AZURE_OPENAI_ENDPOINT }}" \
+            --from-literal=AZURE_OPENAI_API_KEY="${{ secrets.AZURE_OPENAI_API_KEY }}" \
+            -n ${{ env.NAMESPACE }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
       - name: Create ACR pull secret
         run: |
           kubectl create secret docker-registry acr-secret \
@@ -95,33 +113,11 @@ jobs:
             -n ${{ env.NAMESPACE }} \
             --dry-run=client -o yaml | kubectl apply -f -
 
-      - name: Create prod values file from secrets
-        run: |
-          cat > /tmp/values-prod.yaml <<EOF
-          imagePullSecrets:
-            - name: acr-secret
-          
-          backend_secrets:
-            MONGODB_URI: ${{ secrets.MONGODB_URI }}
-            JWT_SECRET: ${{ secrets.JWT_SECRET }}
-            JWT_EXPIRE: ${{ secrets.JWT_EXPIRE }}
-            EMAIL_HOST: ${{ secrets.EMAIL_HOST }}
-            EMAIL_PORT: ${{ secrets.EMAIL_PORT }}
-            EMAIL_USER: ${{ secrets.EMAIL_USER }}
-            EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
-            EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
-            ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-            ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-            AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_OPENAI_ENDPOINT }}
-            AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_OPENAI_API_KEY }}
-          EOF
-
       - name: Deploy with Helm (upgrade or install)
         run: |
           helm upgrade --install ${{ env.RELEASE_NAME }} ./win_k8s \
             -n ${{ env.NAMESPACE }} \
             -f win_k8s/values-template.yaml \
-            -f /tmp/values-prod.yaml \
             --set backend.tag=latest \
             --set frontend.tag=latest \
             --wait \
