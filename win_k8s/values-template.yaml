@@ -58,7 +58,7 @@ ingress:
   className: "nginx"
   annotations: {}
   hosts:
-    - host: "*"
+    - host: ""  # Empty = accept any hostname/IP
       paths:
         - path: /
           pathType: Prefix
