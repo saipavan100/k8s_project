@@ -13,19 +13,66 @@ spec:
     metadata:
       labels:
         {{- include "win_k8s.labels" . | nindent 8 }}
+        component: backend
+        component: frontend
     spec:
       containers:
+        # Backend Container
         - name: backend
           image: "{{ .Values.backend.repository }}:{{ .Values.backend.tag }}"
           imagePullPolicy: {{ .Values.backend.pullPolicy }}
           ports:
             - name: backend
-              containerPort: 5000
+              containerPort: {{ .Values.service.backendPort }}
               protocol: TCP
+          
+          # Load environment variables from ConfigMap
+          envFrom:
+            - configMapRef:
+                name: {{ include "win_k8s.fullname" . }}-config
+            - secretRef:
+                name: {{ include "win_k8s.fullname" . }}-secret
+          
+          # Health check
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: backend
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: backend
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+        # Frontend Container
         - name: frontend
           image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
           imagePullPolicy: {{ .Values.frontend.pullPolicy }}
           ports:
             - name: frontend
-              containerPort: 3000
+              containerPort: {{ .Values.service.frontendPort }}
               protocol: TCP
+          
+          # Load environment variables from ConfigMap
+          envFrom:
+            - configMapRef:
+                name: {{ include "win_k8s.fullname" . }}-config
+          
+          # Health check
+          livenessProbe:
+            httpGet:
+              path: /
+              port: frontend
+            initialDelaySeconds: 40
+            periodSeconds: 30
+          
+          readinessProbe:
+            httpGet:
+              path: /
+              port: frontend
+            initialDelaySeconds: 20
+            periodSeconds: 10

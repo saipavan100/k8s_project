@@ -1,15 +1,37 @@
+---
+# Backend Service (Internal ClusterIP)
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "win_k8s.fullname" . }}
+  name: {{ include "win_k8s.fullname" . }}-backend
   labels:
     {{- include "win_k8s.labels" . | nindent 4 }}
 spec:
-  type: {{ .Values.service.type }}
+  type: {{ .Values.service.backend.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
+    - name: backend
+      port: {{ .Values.service.backend.port }}
+      targetPort: backend
       protocol: TCP
-      name: http
   selector:
     {{- include "win_k8s.selectorLabels" . | nindent 4 }}
+    component: backend
+
+---
+# Frontend Service (ClusterIP or LoadBalancer)
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "win_k8s.fullname" . }}-frontend
+  labels:
+    {{- include "win_k8s.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.frontend.type }}
+  ports:
+    - name: frontend
+      port: {{ .Values.service.frontend.port }}
+      targetPort: frontend
+      protocol: TCP
+  selector:
+    {{- include "win_k8s.selectorLabels" . | nindent 4 }}
+    component: frontend
