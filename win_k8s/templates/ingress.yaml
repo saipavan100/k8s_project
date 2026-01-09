@@ -33,7 +33,7 @@ spec:
             pathType: {{ .pathType }}
             backend:
               service:
-                name: {{ .Release.Name }}-frontend
+                name: {{ $.Release.Name }}-frontend
                 port:
                   number: {{ $.Values.service.frontend.port }}
           {{- end }}
