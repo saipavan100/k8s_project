@@ -5,7 +5,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-backend
   labels:
-    app: {{ .Release.Name }}
+    app: {{ .Release.Name }}-backend
 spec:
   type: {{ .Values.service.backend.type }}
   ports:
@@ -14,7 +14,7 @@ spec:
       targetPort: backend
       protocol: TCP
   selector:
-    app: {{ .Release.Name }}
+    app: {{ .Release.Name }}-backend
 
 ---
 # Frontend Service (ClusterIP or LoadBalancer)
@@ -23,7 +23,7 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-frontend
   labels:
-    app: {{ .Release.Name }}
+    app: {{ .Release.Name }}-frontend
 spec:
   type: {{ .Values.service.frontend.type }}
   ports:
@@ -32,4 +32,4 @@ spec:
       targetPort: frontend
       protocol: TCP
   selector:
-    app: {{ .Release.Name }}
+    app: {{ .Release.Name }}-frontend

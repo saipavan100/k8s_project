@@ -1,25 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-win-k8s
+  name: {{ .Release.Name }}-backend
   labels:
-    app: {{ .Release.Name }}
+    app: {{ .Release.Name }}-backend
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Release.Name }}
+      app: {{ .Release.Name }}-backend
   template:
     metadata:
       labels:
-        app: {{ .Release.Name }}
+        app: {{ .Release.Name }}-backend
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       containers:
-        # Backend Container
         - name: backend
           image: "{{ .Values.backend.repository }}:{{ .Values.backend.tag }}"
           imagePullPolicy: {{ .Values.backend.pullPolicy }}
@@ -46,31 +45,4 @@ spec:
               path: /health
               port: backend
             initialDelaySeconds: 30
-            periodSeconds: 10
-
-        # Frontend Container
-        - name: frontend
-          image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
-          imagePullPolicy: {{ .Values.frontend.pullPolicy }}
-          ports:
-            - name: frontend
-              containerPort: {{ .Values.service.frontend.port }}
-              protocol: TCP
-          
-          envFrom:
-            - configMapRef:
-                name: {{ .Release.Name }}-config
-          
-          livenessProbe:
-            httpGet:
-              path: /
-              port: frontend
-            initialDelaySeconds: 40
-            periodSeconds: 30
-          
-          readinessProbe:
-            httpGet:
-              path: /
-              port: frontend
-            initialDelaySeconds: 20
             periodSeconds: 10

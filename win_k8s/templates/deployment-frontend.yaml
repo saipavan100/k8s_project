@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-frontend
+  labels:
+    app: {{ .Release.Name }}-frontend
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}-frontend
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}-frontend
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: frontend
+          image: "{{ .Values.frontend.repository }}:{{ .Values.frontend.tag }}"
+          imagePullPolicy: {{ .Values.frontend.pullPolicy }}
+          ports:
+            - name: frontend
+              containerPort: {{ .Values.service.frontend.port }}
+              protocol: TCP
+          
+          env:
+            - name: BACKEND_HOST
+              value: "{{ .Release.Name }}-backend:5000"
+          
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-config
+          
+          livenessProbe:
+            httpGet:
+              path: /
+              port: frontend
+            initialDelaySeconds: 120
+            periodSeconds: 30
+          
+          readinessProbe:
+            httpGet:
+              path: /
+              port: frontend
+            initialDelaySeconds: 60
+            periodSeconds: 10
