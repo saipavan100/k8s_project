@@ -8,6 +8,7 @@ on:
 
 env:
   ACR_REGISTRY: ${{ secrets.ACR_NAME }}.azurecr.io
+  ACR_REGISTRY_LOWERCASE: $(echo '${{ secrets.ACR_NAME }}' | tr '[:upper:]' '[:lower:]').azurecr.io
   IMAGE_NAME_BACKEND: myapp-backend
   IMAGE_NAME_FRONTEND: myapp-frontend
   NAMESPACE: winonboard
@@ -88,8 +89,9 @@ jobs:
 
       - name: Create ACR pull secret
         run: |
+          REGISTRY_LOWERCASE=$(echo "${{ secrets.ACR_NAME }}" | tr '[:upper:]' '[:lower:]').azurecr.io
           kubectl create secret docker-registry acr-secret \
-            --docker-server=${{ env.ACR_REGISTRY }} \
+            --docker-server=$REGISTRY_LOWERCASE \
             --docker-username=${{ secrets.ACR_USERNAME }} \
             --docker-password=${{ secrets.ACR_PASSWORD }} \
             -n ${{ env.NAMESPACE }} \
