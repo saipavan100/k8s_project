@@ -1,0 +1,10 @@
+grafana:
+  grafana.ini:
+    server:
+      root_url: http://20.246.186.164/grafana
+      serve_from_sub_path: true
+
+prometheus:
+  prometheusSpec:
+    externalUrl: http://20.246.186.164/prometheus
+    routePrefix: /
