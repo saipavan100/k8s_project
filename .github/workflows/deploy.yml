@@ -60,6 +60,8 @@ jobs:
           docker push ${{ env.ACR_REGISTRY }}/${{ env.IMAGE_NAME_FRONTEND }}:latest
 
   deploy-helm:
+    permissions:
+      contents: read
     needs: [build-backend, build-frontend]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
