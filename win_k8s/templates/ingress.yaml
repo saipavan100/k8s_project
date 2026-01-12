@@ -25,8 +25,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    - host: {{ .Values.ingress.host | default "" | quote }}
-      http:
+    - http:
         paths:
           - path: /
             pathType: Prefix
