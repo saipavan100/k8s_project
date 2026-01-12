@@ -41,18 +41,4 @@ spec:
                 name: {{ $.Release.Name }}-backend
                 port:
                   number: {{ $.Values.service.backend.port }}
-          - path: /grafana
-            pathType: Prefix
-            backend:
-              service:
-                name: prometheus-grafana
-                port:
-                  number: 80
-          - path: /prometheus
-            pathType: Prefix
-            backend:
-              service:
-                name: prometheus-kube-prometheus-prometheus
-                port:
-                  number: 9090
 {{- end }}
