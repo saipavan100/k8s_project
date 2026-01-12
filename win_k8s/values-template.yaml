@@ -60,7 +60,7 @@ service:
 ingress:
   enabled: true
   className: "nginx"
-  host: "18.118.12.1"
+  host: ""  # Empty to accept any hostname/IP
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
   tls: []
